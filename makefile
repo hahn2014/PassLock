@@ -1,5 +1,6 @@
 # Thanks to Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
 TARGET_EXEC := PassLock
+DEBUG_EXEC := PassLockDebug
 
 BUILD_DIR := ./build
 SRC_DIRS := ./src
@@ -24,6 +25,12 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
 CPPFLAGS := $(INC_FLAGS) -MMD -MP
+DBGCFLAGS = $(INC_FLAGS) -g -O0 -DDEBUG
+
+# debug settings
+DBGEXE = $(BUILD_DIR)/$(DEBUG_EXEC)
+
+
 
 # The final build step.
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
@@ -35,14 +42,23 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 
-.PHONY: clean
 clean:
 	rm -r $(BUILD_DIR)
 
-.PHONY : run
-	run: $(BUILD_DIR)
-	    $(TARGET_EXEC) "-d"
+run: $(TARGET_EXEC)
+	./$(TARGET_EXEC)
 
+debug: $(TARGET_EXEC)
+	valgrind $(TARGET_EXEC)
+
+valgrind: $(TARGET_EXEC)
+	valgrind $(TARGET_EXEC)
+
+valgrind_leakcheck: $(TARGET_EXEC)
+	valgrind --leak-check=full $(TARGET_EXEC)
+
+valgrind_extreme: $(TARGET_EXEC)
+	valgrind --leak-check=full --show-leak-kinds=all --leak-resolution=high --track-origins=yes --vgdb=yes $(TARGET_EXEC)
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those
 # errors to show up.

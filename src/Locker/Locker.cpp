@@ -1,20 +1,25 @@
 #include "Locker.h"
 
 Locker::Locker() {
+    createLocker();
     setName("Default Value");
     setID(-1);
     setURL("www.google.com");
+    printf("default locker created\n");
 }
 
-Locker::Locker(string name) {
-    printf("New locker created: %s\n", name.c_str());
-    setName(name);
-    setID(1);
-    setURL("");
+void Locker::createLocker() {
+    int maxchar = 64;
+    lock = (struct locker*)malloc(sizeof(struct locker) + sizeof(char) * maxchar);
 }
 
 Locker::~Locker() {
     printf("locker deleted..\n");
+    //calloc(this->lock);
+}
+
+void Locker::printLocker() {
+    printf("Locker [%d]: %s -> %s\n", lock->id, lock->name.c_str(), lock->url.c_str());
 }
 
 //
@@ -22,25 +27,25 @@ Locker::~Locker() {
 //
 
 int Locker::getID() {
-    return this->id;
+    return lock->id;
 }
 
-void Locker::setID(int id) {
-    this->id = id;
+void Locker::setID(int newid) {
+    lock->id = newid;
 }
 
-string Locker::getName() {
-    return this->name;
+std::string Locker::getName() {
+    return lock->name;
 }
 
-void Locker::setName(string name) {
-    this->name = name;
+void Locker::setName(std::string newname) {
+    lock->name = newname;
 }
 
-string Locker::getURL() {
-    return this->url;
+std::string Locker::getURL() {
+    return lock->url;
 }
 
-void Locker::setURL(string url) {
-    this->url = url;
+void Locker::setURL(std::string newurl) {
+    lock->url = newurl;
 }

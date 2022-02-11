@@ -1,3 +1,6 @@
+#ifndef LOG_H
+#define LOG_H
+
 #include <string>
 
 using namespace std;
@@ -13,3 +16,5 @@ public:
     // more functions for output formatting
 
 };
+
+#endif

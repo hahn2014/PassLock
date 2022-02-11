@@ -1,25 +1,34 @@
-#include <string>
+#ifndef LOCKER_H
+#define LOCKER_H
 
-using namespace std;
+#include <string>
 
 class Locker {
 public:
     Locker();
-    Locker(string);
     ~Locker();
-    string name;
-    string url;
-    int id;
+    //DEBUG for testing, should not be accessible in the future
+    void printLocker();
 
     // getters and setters
     int getID();
-    string getName();
-    string getURL();
+    std::string getName();
+    std::string getURL();
 
     void setID(int);
-    void setName(string);
-    void setURL(string);
+    void setName(std::string);
+    void setURL(std::string);
+
+    struct locker {
+        std::string name;
+        std::string url;
+        int id;
+    };
+
+    struct locker* lock;
 
 private:
-
+    void createLocker();
 };
+
+#endif

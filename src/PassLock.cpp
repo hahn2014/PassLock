@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <Locker.h>
+#include <Lockerroom.h>
 #include <Log.h>
 
 using namespace std;
 
 static string VERSION = "1.0.1";
-static int MAX_MENU_OPTIONS = 7;
+static int MAX_MENU_OPTIONS = 9;
 
+Lockerroom lockers;
 
 bool validMenuSelection(string inp) {
     if (inp != "-h") { //help command
@@ -38,6 +39,7 @@ int menuDelegator(string inp) {
 
         case 1:
             //Option 1 - List ALL lockers (name / url / id only)
+            lockers.printLockerroom();
             return 0;
 
         case 2:
@@ -46,10 +48,12 @@ int menuDelegator(string inp) {
 
         case 3:
             //Option 3 - Create NEW locker
+            if (lockers.createLocker()) printf("Successfully created new Locker\n");
             return 0;
 
         case 4:
             //Option 4 - View Existing Locker (ID needed)
+            lockers.getLockByID();
             return 0;
 
         case 5:
@@ -57,12 +61,23 @@ int menuDelegator(string inp) {
             return 0;
 
         case 6:
-            //Option 6 - Get ID (by name), if multiple site under same name, list all
+            //Option 6 - Delete Existing Locker (ID needed)
+            lockers.deleteLocker();
             return 0;
 
         case 7:
-            //Option 7 - Run GUI PassLock (implement once system in general is working)
+            //Option 7 - Get ID (by name), if multiple site under same name, list all
+            lockers.getLockByName();
+            return 0;
+
+        case 8:
+            //Option 8 - Run GUI PassLock
             printf("Last area of development.. Please give me some time\n");
+            return 0;
+
+        case 9:
+            //Option 9 - seceret developer setting
+            lockers.randLocks();
             return 0;
 
     }
@@ -81,10 +96,14 @@ int main() {
 
     //if no previous user exists, make new
 
+    //initialize Lockerroom
+    string user = "hahnsolo";
+    lockers.setUser(user);
+    lockers.randLocks();
+
     printf("\t--Type -h for help--\n");
 
     string input = "";
-    string user = "hahnsolo";
 
     while (input[0] != '0') {
         input = ""; //reset the input param
