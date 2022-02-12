@@ -2,8 +2,7 @@
 #define LOG_H
 
 #include <string>
-
-using namespace std;
+#include <iostream>
 
 class Log {
 public:
@@ -12,6 +11,7 @@ public:
     void Info();
     void Error();
     void static printHelp();
+    std::string static getInput(std::string, int, int);
     //void func(Args... args);
     // more functions for output formatting
 

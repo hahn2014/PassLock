@@ -26,7 +26,20 @@ void Log::printHelp() {
     printf("8 - Run GUI PassLock\n\n\n");
 }
 
-// template<class... Args>
-// void func(Args... args) {
-//     (std::cout << ... << args) << "\n";
-// }
+std::string Log::getInput(std::string prompt, int min, int max) {
+    std::string input;
+    while (true) {
+        input = ""; //reset the input param
+        printf("%s >", prompt.c_str());
+        getline(std::cin, input);
+
+        if (input.length() >= min && input.length() <= max) {
+            return input;
+        } else if (input.length() < min) {
+            printf("%s min length not met. %s must be at least %d characters.\n\n", prompt.c_str(), prompt.c_str(), min);
+        } else if (input.length() > max) {
+            printf("%s max length exceeded. %s must be less than %d characters.\n\n", prompt.c_str(), prompt.c_str(), max);
+        }
+    }
+    return "";
+}

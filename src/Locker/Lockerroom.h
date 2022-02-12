@@ -2,6 +2,7 @@
 #define LOCKERROOM_H
 
 #include "Locker.h"
+#include "Log.h"
 #include <iostream>
 #include <vector>
 #include <stdio.h>
@@ -14,10 +15,10 @@ public:
     ~Lockerroom();
     void setUser(std::string);
     bool createLocker();
+    bool editLocker();
     void getLockByID();
     void getLockByName();
     void getLockByGroup();
-    void editLocker();
     void deleteLocker();
     void printLockerroom();
 

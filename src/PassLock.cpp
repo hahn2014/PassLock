@@ -5,14 +5,14 @@
 #include "Log.h"
 #include "Profiler.h"
 
-static string VERSION = "1.0.2";
+static std::string VERSION = "1.0.2";
 static int MAX_MENU_OPTIONS = 9;
 
 Lockerroom lockers;
 Profiler userprof;
 std::string user;
 
-bool validMenuSelection(string inp) {
+bool validMenuSelection(std::string inp) {
     if (inp != "-h") { //help command
         try {
             int selection = std::stoi(inp);
@@ -27,7 +27,7 @@ bool validMenuSelection(string inp) {
     return true;
 }
 
-int menuDelegator(string inp) {
+int menuDelegator(std::string inp) {
     if (inp == "-h") {
         Log::printHelp();
         return 0; //continue clause
@@ -60,6 +60,7 @@ int menuDelegator(string inp) {
 
         case 5:
             //Option 5 - Edit Existing Locker (ID needed)
+            if (lockers.editLocker()) printf("Successfully updated Locker\n\n\n");
             return 0;
 
         case 6:
@@ -115,13 +116,13 @@ int main() {
     //program delegator
     printf("\t--Type -h for help--\n\n");
 
-    string input = "";
+    std::string input = "";
 
     while (input[0] != '0') {
         input = ""; //reset the input param
         printf("PassLock@%s> ", user.c_str());
 
-    	getline(cin, input);
+    	getline(std::cin, input);
 
         if (validMenuSelection(input)) {
             //Log::Debug("good input: %s\n", input.c_str()); //still need to figure out indefinite arguments
