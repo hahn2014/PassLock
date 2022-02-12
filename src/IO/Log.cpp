@@ -30,7 +30,7 @@ std::string Log::getInput(std::string prompt, int min, int max) {
     std::string input;
     while (true) {
         input = ""; //reset the input param
-        printf("%s >", prompt.c_str());
+        printf("%s%s> ", prompt.c_str(), calculateSpaces(prompt).c_str());
         getline(std::cin, input);
 
         if (input.length() >= min && input.length() <= max) {
@@ -42,4 +42,13 @@ std::string Log::getInput(std::string prompt, int min, int max) {
         }
     }
     return "";
+}
+
+std::string Log::calculateSpaces(std::string prompt) {
+    int maxlength = 20;
+    std::stringstream spaces;
+    for (int i = 0; i < (maxlength - prompt.length()); i++) {
+        spaces << " ";
+    }
+    return spaces.str();
 }

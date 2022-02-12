@@ -31,7 +31,6 @@ void Lockerroom::printLockerroom() {
 }
 
 bool Lockerroom::createLocker() {
-    //allocateLocker();
     Locker* l = new Locker();
     lockercount++;
     l->setID(lockercount);
@@ -71,19 +70,53 @@ bool Lockerroom::createLocker() {
 
 bool Lockerroom::editLocker() {
     int id;
+    Locker* l = new Locker();
+    std::string input;
     //step 1 get the locker by ID
     try {
         id = stoi(Log::getInput("Locker ID", 1, 64));
     } catch (...) {
         std::cerr << "Invalid ID. Please use a valid integer!" << std::endl;
+        return false;
     }
-    //step 2 get which part of the locker to edit
+    //verify inputed ID is a valid Locker
+    for (int i = 0; i < lockerroom.size(); i++) {
+        if (lockerroom.at(i)->getID() == id) {
+            l->setID(id);
 
-    //step 3 get input for new value
+            printf("\n--- Locker Editor {%d} ---\n", id);
 
-    //step 4 set the new value and replace vector
+            //get name
+            input = ""; //input reset
+            input = Log::getInput("Locker Name", 2, 64);
+            l->setName(input);
 
-    return true;
+            //get url
+            input = ""; //input reset
+            input = Log::getInput("Locker URL", 4, 128);
+            l->setURL(input);
+
+            //get group
+            input = ""; //input reset
+            input = Log::getInput("Locker Grouping", 1, 64);
+            l->setGroup(input);
+
+            //get username
+            input = ""; //input reset
+            input = Log::getInput("Locker Username", 3, 64);
+            l->setUsername(input);
+
+            //get password
+            // input = "";
+            // input = Log::getInput("Locker Password", 8, 128);
+            // l->setPassword(input);
+
+            lockerroom.at(id) = l;
+            return true;
+        }
+    }
+    printf("Locker %d does not exist\n", id);
+    return false;
 }
 
 void Lockerroom::randLocks() {
