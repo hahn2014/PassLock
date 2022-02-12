@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <Lockerroom.h>
-#include <Log.h>
+#include "Lockerroom.h"
+#include "Log.h"
+#include "Profiler.h"
 
-using namespace std;
-
-static string VERSION = "1.0.1";
+static string VERSION = "1.0.2";
 static int MAX_MENU_OPTIONS = 9;
 
 Lockerroom lockers;
+Profiler userprof;
+std::string user;
 
 bool validMenuSelection(string inp) {
     if (inp != "-h") { //help command
@@ -34,7 +35,7 @@ int menuDelegator(string inp) {
 
     switch(stoi(inp)) {
         case 0:
-            printf("Goodbye!\n");
+            printf("Goodbye!\n\n");
             return 1; //exit clause
 
         case 1:
@@ -44,11 +45,12 @@ int menuDelegator(string inp) {
 
         case 2:
             //Option 2 - List ALL lockers by grouping
+            lockers.getLockByGroup();
             return 0;
 
         case 3:
             //Option 3 - Create NEW locker
-            if (lockers.createLocker()) printf("Successfully created new Locker\n");
+            if (lockers.createLocker()) printf("Successfully created new Locker\n\n\n");
             return 0;
 
         case 4:
@@ -85,23 +87,33 @@ int menuDelegator(string inp) {
 }
 
 int main() {
-    //confirm master password to gain access
+    //load in user profile (/db/user.ini)
+    if (userprof.startup()) {
+        user = userprof.getUser();
+        //confirm master password to gain access
+
+
+
+    } else {
+        std::cerr << "Unexpected error occured while loading user profile." << std::endl;
+        return -1;
+    }
+
 
 
     //welcome screen
-    printf("\nWelcome to PassLock! The all emcompassing Password Lockerroom.\n");
+    printf("\nWelcome %s to PassLock! The all emcompassing Password Lockerroom.\n", user.c_str());
     printf("PassLock CLI Developed by Bryce Hahn (@hahn2014) -- v%s\n", VERSION.c_str());
 
-    //load in user profile
-
-    //if no previous user exists, make new
-
     //initialize Lockerroom
-    string user = "hahnsolo";
     lockers.setUser(user);
     lockers.randLocks();
 
-    printf("\t--Type -h for help--\n");
+    //load user database
+
+
+    //program delegator
+    printf("\t--Type -h for help--\n\n");
 
     string input = "";
 

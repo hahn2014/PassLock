@@ -23,7 +23,7 @@ void Log::printHelp() {
     printf("5 - Edit Existing Locker (ID Needed)\n");
     printf("6 - Delete Existing Locker (ID Needed)\n");
     printf("7 - Get Locker ID (Name Needed)\n");
-    printf("8 - Run GUI PassLock\n\n");
+    printf("8 - Run GUI PassLock\n\n\n");
 }
 
 // template<class... Args>

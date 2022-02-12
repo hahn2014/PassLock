@@ -5,7 +5,6 @@ Locker::Locker() {
     setName("Default Value");
     setID(-1);
     setURL("www.google.com");
-    printf("default locker created\n");
 }
 
 void Locker::createLocker() {
@@ -13,13 +12,8 @@ void Locker::createLocker() {
     lock = (struct locker*)malloc(sizeof(struct locker) + sizeof(char) * maxchar);
 }
 
-Locker::~Locker() {
-    printf("locker deleted..\n");
-    //calloc(this->lock);
-}
-
 void Locker::printLocker() {
-    printf("Locker [%d]: %s -> %s\n", lock->id, lock->name.c_str(), lock->url.c_str());
+    printf("Locker [%d: %s]: %s (User: %s) -> {%s}\n", lock->id, lock->group.c_str(), lock->name.c_str(), lock->username.c_str(), lock->url.c_str());
 }
 
 //
@@ -42,10 +36,26 @@ void Locker::setName(std::string newname) {
     lock->name = newname;
 }
 
+std::string Locker::getUsername() {
+    return lock->username;
+}
+
+void Locker::setUsername(std::string user) {
+    lock->username = user;
+}
+
 std::string Locker::getURL() {
     return lock->url;
 }
 
 void Locker::setURL(std::string newurl) {
     lock->url = newurl;
+}
+
+std::string Locker::getGroup() {
+    return lock->group;
+}
+
+void Locker::setGroup(std::string group) {
+    lock->group = group;
 }

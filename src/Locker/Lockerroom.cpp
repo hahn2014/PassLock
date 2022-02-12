@@ -27,6 +27,7 @@ void Lockerroom::printLockerroom() {
     if (lockerroom.size() == 0) {
         printf("There is nothing here yet...\n\n");
     }
+    printf("\n\n");
 }
 
 bool Lockerroom::createLocker() {
@@ -36,7 +37,7 @@ bool Lockerroom::createLocker() {
     l->setID(lockercount);
     std::string input;
 
-    printf("--- New Locker Setup {%d} ---\n", lockercount);
+    printf("\n--- New Locker Setup {%d} ---\n", lockercount);
 
     //get name
     while (true) {
@@ -57,15 +58,40 @@ bool Lockerroom::createLocker() {
         printf("Locker URL      >");
         getline(std::cin, input);
 
-        if (input.length() > 9 && input.length() <= 256) { //no longer than 64 char
+        if (input.length() <= 256) { //no longer than 64 char
             l->setURL(input);
             break; //break out of name loop
         } else {
             printf("Locker URL size overflow. Please keep the URL < 256 characters.\n\n");
         }
     }
+    //get group
+    while (true) {
+        input = ""; //reset the input param
+        printf("Locker Grouping >");
+        getline(std::cin, input);
 
-    printf("Locker Username >");
+        if (input.length() > 0) { //no longer than 64 char
+            l->setGroup(input);
+            break; //break out of name loop
+        } else {
+            printf("Locker Group min size not met. Grouping name must be > 1 character.\n\n");
+        }
+    }
+    //get username
+    while (true) {
+        input = ""; //reset the input param
+        printf("Locker Username >");
+        getline(std::cin, input);
+
+        if (input.length() > 3) { //no smaller than 3 char
+            l->setUsername(input);
+            break; //break out of name loop
+        } else {
+            printf("Locker Username min length not met. Please use a username > 3 characters.\n\n");
+        }
+    }
+
     printf("Locker Password >");
 
     lockerroom.push_back(l);
@@ -84,6 +110,8 @@ void Lockerroom::randLocks() {
         l->setName(ss.str());
         l->setID(lockercount);
         l->setURL("www.github.com/hahn2014");
+        l->setGroup("Programming");
+        l->setUsername("HahnSolo");
 
         lockerroom.push_back(l);
     }
@@ -115,10 +143,11 @@ void Lockerroom::getLockByID() {
     for (int i = 0; i < lockerroom.size(); i++) {
         if (lockerroom[i]->getID() == id) {
             lockerroom[i]->printLocker();
+            printf("\n\n");
             return;
         }
     }
-    printf("Locker %d does not exist in the Lockerroom\n\n", id);
+    printf("Locker %d does not exist in the Lockerroom\n\n\n", id);
 }
 
 void Lockerroom::getLockByName() {
@@ -139,14 +168,46 @@ void Lockerroom::getLockByName() {
                     namematch++;
                 }
             }
-            if (namematch > 0) return; //found as many values as we could
-            else break; //no names matched, break out of loop and notify user
+            if (namematch > 0) {
+                printf("\n\n");
+                return; //found as many values as we could
+            } else break; //no names matched, break out of loop and notify user
         } else {
             printf("Locker name overflow. Invalid string length: %lu\n\n", input.length());
         }
     }
 
-    printf("Locker %s does not exist in the Lockerroom\n\n", input.c_str());
+    printf("Locker %s does not exist in the Lockerroom\n\n\n", input.c_str());
+}
+
+void Lockerroom::getLockByGroup() {
+    std::string input;
+    int groupmatch = 0;
+    printf("\n--- Locker Group Querry ---\n");
+
+    while (true) {
+        input = "";
+        printf("Locker Group    >");
+        getline(std::cin, input);
+
+        if (input.length() > 0) { //must be at least 1 char long
+            //find locker by ID
+            for (int i = 0; i < lockerroom.size(); i++) {
+                if (lockerroom[i]->getGroup() == input) {
+                    lockerroom[i]->printLocker();
+                    groupmatch++;
+                }
+            }
+            if (groupmatch > 0) {
+                printf("\n\n");
+                return; //found as many values as we could
+            } else break; //no names matched, break out of loop and notify user
+        } else {
+            printf("Locker grouping overflow. Invalid string length: %lu\n\n", input.length());
+        }
+    }
+
+    printf("Locker Group %s does not exist in the Lockerroom\n\n\n", input.c_str());
 }
 
 void Lockerroom::editLocker() {
@@ -186,21 +247,36 @@ void Lockerroom::deleteLocker() {
     for (int i = 0; i < lockerroom.size(); i++) {
         if (lockerroom[i]->getID() == id) {
             lockerroom.erase(lockerroom.begin() + i);
-            //delete lockerroom[i];
+            refactorIDIndex(i); //fix ID index for lockers i+1 and above (if any)
+            printf("Locker Deleted!\n\n\n");
             return;
         }
     }
-    printf("Locker %d does not exist in the Lockerroom\n\n", id);
+    printf("Locker %d does not exist in the Lockerroom\n\n\n", id);
+}
+
+void Lockerroom::refactorIDIndex(int startindex) {
+    int tmp = 0;
+    if (startindex < lockerroom.size()) {
+        for (int i = startindex; i < lockerroom.size(); i++) {
+            tmp = lockerroom[i]->getID();
+            lockerroom[i]->setID(tmp - 1); // move all IDs down by 1
+        }
+    } else {
+        printf("Locker %d was the end of the vector\n", startindex);
+    }
 }
 
 void Lockerroom::setUser(std::string newUser) {
     this->user = newUser;
 }
 
-std::string Lockerroom::toLower(std::string str) {
-    std::string retval;
-    for (int i = 0; i < str.length(); i++) {
-        retval[i] = std::tolower(str[i]);
+void Lockerroom::addGroup(std::string group) {
+    if (std::find(groups.begin(), groups.end(), group) != groups.end()) {
+        std::cout << "Grouping found";
     }
-    return retval;
+    else {
+        std::cout << "Grouping not found, adding...";
+        groups.push_back(group);
+    }
 }

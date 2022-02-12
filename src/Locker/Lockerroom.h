@@ -16,6 +16,7 @@ public:
     bool createLocker();
     void getLockByID();
     void getLockByName();
+    void getLockByGroup();
     void editLocker();
     void deleteLocker();
     void printLockerroom();
@@ -24,10 +25,14 @@ public:
     void randLocks();
 
 private:
+    void addGroup(std::string);
+    void refactorIDIndex(int);
+
     int lockercount;
     std::string user;
     std::vector<Locker*> lockerroom;
     std::string toLower(std::string);
+    std::vector<std::string> groups;
 };
 
 #endif

@@ -1,5 +1,8 @@
-#ignore lib imports
+# ignore lib imports
 /lib
+
+# ignore user data
+/db/user.ini
 
 # Prerequisites
 *.d
