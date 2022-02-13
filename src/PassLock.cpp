@@ -5,7 +5,7 @@
 #include "Log.h"
 #include "Profiler.h"
 
-static std::string VERSION = "1.0.2";
+static std::string VERSION = "1.0.3";
 static int MAX_MENU_OPTIONS = 9;
 
 Lockerroom lockers;
@@ -92,8 +92,15 @@ int main() {
     if (userprof.startup()) {
         user = userprof.getUser();
         //confirm master password to gain access
+        printf("\nHello, %s. Please confirm master password\n", user.c_str());
+        std::string testpass = Log::getInput("Master Password", 8, 64);
 
-
+        if (testpass == userprof.getPass()) {
+            printf("Passwords match!\n\n");
+        } else {
+            printf("Invalid password..\nShutting down.\n");
+            return -1;
+        }
 
     } else {
         std::cerr << "Unexpected error occured while loading user profile." << std::endl;
