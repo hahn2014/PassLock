@@ -14,6 +14,8 @@ public:
     Lockerroom(std::string);
     ~Lockerroom();
     void setUser(std::string);
+    std::vector<Locker*> getLockerroom();
+    void setLockerroom(std::vector<Locker*>);
     bool createLocker();
     bool editLocker();
     void getLockByID();

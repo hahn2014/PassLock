@@ -1,6 +1,3 @@
-# ignore lib imports
-/lib
-
 # ignore user data
 /db/
 

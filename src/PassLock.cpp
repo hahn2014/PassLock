@@ -5,8 +5,8 @@
 #include "Log.h"
 #include "Profiler.h"
 
-static std::string VERSION = "1.0.3";
-static int MAX_MENU_OPTIONS = 9;
+static std::string VERSION = "1.0.4";
+static int MAX_MENU_OPTIONS = 10;
 
 Lockerroom lockers;
 Profiler userprof;
@@ -79,10 +79,14 @@ int menuDelegator(std::string inp) {
             return 0;
 
         case 9:
-            //Option 9 - seceret developer setting
+            //Option 9 - seceret developer setting (generate random accounts)
             lockers.randLocks();
             return 0;
-
+        case 10:
+            //Option 10 - seceret developer setting (test save profile)
+            printf("test save\n\n");
+            userprof.saveLockerroom(lockers.getLockerroom());
+            return 0;
     }
     return -1; //error clause
 }
@@ -115,10 +119,9 @@ int main() {
 
     //initialize Lockerroom
     lockers.setUser(user);
-    lockers.randLocks();
 
     //load user database
-
+    lockers.setLockerroom(userprof.getLockerroom());
 
     //program delegator
     printf("\t--Type -h for help--\n\n");

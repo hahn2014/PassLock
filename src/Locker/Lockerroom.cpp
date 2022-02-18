@@ -245,6 +245,17 @@ void Lockerroom::setUser(std::string newUser) {
     this->user = newUser;
 }
 
+void Lockerroom::setLockerroom(std::vector<Locker*> import) {
+    if (import.size() > 0) { //import is not an empty vector
+        this->lockerroom = import;
+        this->lockercount = import.size(); //keep the lockercount updated with imported count
+    }
+}
+
+std::vector<Locker*> Lockerroom::getLockerroom() {
+    return this->lockerroom;
+}
+
 void Lockerroom::addGroup(std::string group) {
     if (std::find(groups.begin(), groups.end(), group) != groups.end()) {
         std::cout << "Grouping found";

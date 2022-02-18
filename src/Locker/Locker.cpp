@@ -44,6 +44,14 @@ void Locker::setUsername(std::string user) {
     lock->username = user;
 }
 
+std::string Locker::getPassword() {
+    return lock->password;
+}
+
+void Locker::setPassword(std::string pass) {
+    lock->password = pass;
+}
+
 std::string Locker::getURL() {
     return lock->url;
 }

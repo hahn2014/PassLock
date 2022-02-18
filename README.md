@@ -32,8 +32,11 @@ Open Source is the best form of software development. I welcome anyone to fork m
     - [x] Delete Lockers
     - [x] Search Lockers
     - [x] Edit Lockers
-- [ ] User profile creation and loading
-    - [ ] Startup password access
+- [x] User profile creation and loading
+    - [x] Startup password access
+    - [x] Lockerroom XML data populating
+        - [x] Import previous session database on startup
+        - [x] Export current lockerroom and update prof.xml
 - [ ] Password hashing and encryption
     - [ ] SHA3-256 SHA3-512 Hashing Algorithm implementation
 - [ ] Simple Graphical User Interface implementation

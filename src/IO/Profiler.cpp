@@ -122,6 +122,117 @@ std::pair<std::string, std::string> Profiler::interpretINI(std::vector<std::stri
     return {user, pass};
 }
 
+std::vector<Locker*> Profiler::getLockerroom() {
+    //test is prof.xml even exists
+    if (file_exists("./db/prof.xml")) {
+        return importFromXML(); //attempt to load
+    } else {
+        printf("no user XML database was found... could not load a previously populated lockerroom\n\n");
+    }
+    return {};
+}
+
+void Profiler::saveLockerroom(std::vector<Locker*> lockerroom) {
+    //verify if xml file already exists
+    if (file_exists("./db/prof.xml")) {
+        //delete existing database export
+        if (std::remove("./db/prof.xml") != 0)
+            perror("Error deleting old database\n\n");
+        else
+            puts("Outdated database successfully deleted\n\n");
+    }
+    exportToXML(lockerroom); //create new updated database XML
+}
+
+
+std::vector<Locker*> Profiler::importFromXML() {
+    std::vector<Locker*> lockerroom; //store a vector of lockers
+    try {
+        //load XML Database
+        rapidxml::xml_document<> doc;
+        rapidxml::xml_node<>* root_node;
+    	// Read the xml file into a string vector
+        std::ifstream xmlFile("./db/prof.xml");
+        std::vector<char> buffer((std::istreambuf_iterator<char>(xmlFile)), std::istreambuf_iterator<char>());
+	    buffer.push_back('\0');
+		doc.parse<0>(&buffer[0]);
+    	// Find our root node
+    	root_node = doc.first_node("Lockerroom");
+
+        // Iterate over the Lockers
+        for (rapidxml::xml_node<>* locker_node = root_node->first_node("Locker"); locker_node; locker_node = locker_node->next_sibling()) {
+            Locker* l = new Locker(); //every new "Locker" node results in a new Locker pointer
+
+            //populate locker with xml data
+            l->setName(locker_node->first_attribute("name")->value());
+            l->setURL(locker_node->first_attribute("url")->value());
+            l->setGroup(locker_node->first_attribute("grouping")->value());
+            l->setID(atoi(locker_node->first_attribute("id")->value()));
+            //populate the locker's user data
+            rapidxml::xml_node<>* user_node = locker_node->first_node("User");
+            l->setUsername(user_node->first_attribute("user")->value());
+            l->setPassword(user_node->first_attribute("pass")->value());
+
+            lockerroom.push_back(l); //add new locker to lockerroom vector
+        }
+
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Runtime error was: " << e.what() << std::endl;
+    } catch (const rapidxml::parse_error& e) {
+        std::cerr << "Parse error was: " << e.what() << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error was: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "An unknown error occurred." << std::endl;
+    }
+    return lockerroom;
+}
+
+void Profiler::exportToXML(std::vector<Locker*> lockerroom) {
+    //load XML Database
+    rapidxml::xml_document<> doc;
+    rapidxml::xml_node<>* decl = doc.allocate_node(rapidxml::node_declaration);
+    //adding default init attributes at the top of our xml
+    decl->append_attribute(doc.allocate_attribute("version", "1.0"));
+    decl->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+    doc.append_node(decl);
+
+    //creating a pointer for the root note "Lockerroom"
+    rapidxml::xml_node<>* root = doc.allocate_node(rapidxml::node_element, "Lockerroom");
+
+    for (int i = 0; i < lockerroom.size(); i++) {
+        rapidxml::xml_node<>* locker_node = doc.allocate_node(rapidxml::node_element, "Locker");
+        //for each new attribute associated with the locker, we must allocate a string in order
+            //to iterate through the vector database without corrupting the locker values
+        char* lock_name = doc.allocate_string(lockerroom.at(i)->getName().c_str());
+        char* lock_url = doc.allocate_string(lockerroom.at(i)->getURL().c_str());
+        char* lock_group = doc.allocate_string(lockerroom.at(i)->getGroup().c_str());
+        char* lock_id = doc.allocate_string(std::to_string(lockerroom.at(i)->getID()).c_str());
+        locker_node->append_attribute(doc.allocate_attribute("name", lock_name));
+        locker_node->append_attribute(doc.allocate_attribute("url", lock_url));
+        locker_node->append_attribute(doc.allocate_attribute("grouping", lock_group));
+        locker_node->append_attribute(doc.allocate_attribute("id", lock_id));
+
+        //user credentials
+        rapidxml::xml_node<>* user_node = doc.allocate_node(rapidxml::node_element, "User");
+        char* lock_user = doc.allocate_string(lockerroom.at(i)->getUsername().c_str());
+        char* lock_pass = doc.allocate_string(lockerroom.at(i)->getPassword().c_str());
+        user_node->append_attribute(doc.allocate_attribute("user", lock_user));
+        user_node->append_attribute(doc.allocate_attribute("pass", lock_pass));
+
+        //populate current iteration of locker node
+        locker_node->append_node(user_node);
+        root->append_node(locker_node);
+    }
+
+    doc.append_node(root);
+    std::string xml_as_string;
+    rapidxml::print(std::back_inserter(xml_as_string), doc);
+    std::ofstream fileStored("./db/prof.xml");
+    fileStored << xml_as_string;
+    fileStored.close();
+    doc.clear();
+}
 
 // https://stackoverflow.com/a/12774387
 bool Profiler::file_exists(std::string name) {
@@ -131,9 +242,7 @@ bool Profiler::file_exists(std::string name) {
 
 bool Profiler::dir_exists(std::string path) {
     if (fs::is_directory(path)) {
-        //valid dir
-        //printf("%s is a directory\n", path.c_str());
-        return true;
+        return true; //valid dir
     } else {
         //no dir found
         printf("%s was not found.. Creating new database directory\n", path.c_str());
