@@ -37,8 +37,12 @@ Open Source is the best form of software development. I welcome anyone to fork m
     - [x] Lockerroom XML data populating
         - [x] Import previous session database on startup
         - [x] Export current lockerroom and update prof.xml
+    - [x] Exclusive XML database parsing
+    - [x] Choice between multiple profile databases at startup
 - [ ] Password hashing and encryption
     - [ ] SHA3-256 SHA3-512 Hashing Algorithm implementation
+        - [ ] Initial hash compare to verify user password with hashfile
+        - [ ] XML database hashing
 - [ ] Simple Graphical User Interface implementation
 - [ ] Multi-platform executable ports
 - [ ] Database encrypted export/import
