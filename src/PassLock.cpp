@@ -5,7 +5,7 @@
 #include "Log.h"
 #include "Profiler.h"
 
-static std::string VERSION = "1.0.4";
+static std::string VERSION = "1.0.5";
 static int MAX_MENU_OPTIONS = 10;
 
 Lockerroom lockers;
@@ -94,6 +94,7 @@ int menuDelegator(std::string inp) {
 int main() {
     //load in user profile (/db/user.ini)
     if (userprof.startup()) {
+        userprof.importFromXML();
         user = userprof.getUser();
         //confirm master password to gain access
         printf("\nHello, %s. Please confirm master password\n", user.c_str());

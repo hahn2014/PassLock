@@ -14,9 +14,8 @@ class Profiler {
 public:
     Profiler();
     bool startup();
-    bool loadProfile();
+    std::string getProfileNames();
     void createProfile();
-    std::pair<std::string, std::string> interpretINI(std::vector<std::string>);
 
     std::vector<Locker*> importFromXML();
     void exportToXML(std::vector<Locker*>);

@@ -7,52 +7,52 @@ Profiler::Profiler() {
 }
 
 bool Profiler::startup() {
-    //check for existing user.ini
     if (dir_exists("./db/")) {
-        if (file_exists("./db/user.ini")) {
-            //printf("User profile ini found. Loading user profile...\n");
-            return loadProfile();
-        } else {
-            //printf("User profile ini not found. Creating a new user profile...\n");
-            createProfile();
+        //scan for multiple .xml files
+        std::string prof = getProfileNames();
+
+        if (prof == "0") { //no .xml database profiles found, create a new one
+            createProfile(); //create a user
+            exportToXML({}); //export an empty lockerroom to xml (bare min user prof)
             return startup(); //recursively call startup to validate newly created ini file
+        } else { //getProfileNames found at least one .xml database profile and the user picked
+            setUser(prof);
+            return true; //set username from user input, then wait for getLockerroom call
         }
     }
     return false;
 }
 
-bool Profiler::loadProfile() {
-    std::ifstream prof("./db/user.ini");
-    this->user = "";
-    this->pass = "";
-
-    //read ini file line by line
-    if (prof.is_open()) {
-        std::vector<std::string> inivals;
-        std::string line;
-        while (prof >> line) {
-            inivals.push_back(line);
+std::string Profiler::getProfileNames() {
+    std::string path("./db/");
+    std::string ext(".xml");
+    std::vector<std::string> profiles;
+    for (auto &p : fs::recursive_directory_iterator(path)) {
+        if (p.path().extension() == ext) {
+            profiles.push_back(p.path().stem().string()); //push back each .xml name
         }
-
-        std::pair userprof = interpretINI(inivals);
-
-        this->user = userprof.first;
-        this->pass = userprof.second;
-
-        prof.close();
-
-    } else {
-        std::cerr << "Unexpected error when opening user profile\n";
-        return false;
     }
-    return true;
+    if (profiles.size() == 0) return "0";
+    //get user confirmation on which profile to load
+    printf("%lu user profiles were found:\n", profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+        printf("- %s\n", profiles.at(i).c_str());
+    }
+    printf("\nWhich profile should I load? -- (or 0 for new profile)\n");
+
+    std::string profile = Log::getInput("Profile", 1, 32);
+
+    if (std::find(profiles.begin(), profiles.end(), profile) != profiles.end()) {
+        return profile;
+    } else {
+        return "0";
+    }
 }
 
 void Profiler::createProfile() {
     std::string user;
     std::string password;
-    printf("PassLock initial boot-up. Creating new user profile...\n\n");
-    printf("--- New Lockerroom ---\n");
+    printf("\n--- New Lockerroom ---\n");
 
     //get username
     user = Log::getInput("Profile Username", 4, 32);
@@ -70,25 +70,8 @@ void Profiler::createProfile() {
             printf("Passwords did not match!\n");
         }
     }
-
-    //generate ini file
-    std::ofstream prof("./db/user.ini");
-
-    //populate ini file
-    if (prof.is_open()) {
-        try {
-            prof << "[Profile]" << std::endl;
-            prof << "user=" << user << std::endl;
-            prof << "pass=" << password << std::endl; //TEMPORARY. DO NOT SAVE PASSWORDS UNHASHED
-        } catch (...) {
-            std::cerr << "Unexpected error when writing to user profile\n";
-            return;
-        }
-        prof.close();
-    } else {
-        std::cerr << "Unexpected error when opening user profile\n";
-        return;
-    }
+    setUser(user);
+    setPass(password);
 }
 
 void Profiler::setUser(std::string user) {
@@ -107,24 +90,12 @@ std::string Profiler::getPass() {
     return this->pass;
 }
 
-std::pair<std::string, std::string> Profiler::interpretINI(std::vector<std::string> ini) {
-    // ini file setup
-    // [section name]
-    // variable:value
-    std::string user;
-    std::string pass;
-
-    for (int i = 1; i < ini.size(); i++) {
-        if (i == 1) user = ini.at(i).substr(ini.at(i).find("=") + 1);
-        else if (i == 2) pass = ini.at(i).substr(ini.at(i).find("=") + 1);
-    }
-
-    return {user, pass};
-}
-
 std::vector<Locker*> Profiler::getLockerroom() {
+    std::ostringstream oss;
+    oss << "./db/" << this->getUser() << ".xml";
+    std::string userprof = oss.str();
     //test is prof.xml even exists
-    if (file_exists("./db/prof.xml")) {
+    if (file_exists(userprof)) {
         return importFromXML(); //attempt to load
     } else {
         printf("no user XML database was found... could not load a previously populated lockerroom\n\n");
@@ -133,10 +104,13 @@ std::vector<Locker*> Profiler::getLockerroom() {
 }
 
 void Profiler::saveLockerroom(std::vector<Locker*> lockerroom) {
+    std::ostringstream oss;
+    oss << "./db/" << this->getUser() << ".xml";
+    std::string userprof = oss.str();
     //verify if xml file already exists
-    if (file_exists("./db/prof.xml")) {
+    if (file_exists(userprof)) {
         //delete existing database export
-        if (std::remove("./db/prof.xml") != 0)
+        if (std::remove(userprof.c_str()) != 0)
             perror("Error deleting old database\n\n");
         else
             puts("Outdated database successfully deleted\n\n");
@@ -146,18 +120,26 @@ void Profiler::saveLockerroom(std::vector<Locker*> lockerroom) {
 
 
 std::vector<Locker*> Profiler::importFromXML() {
+    std::ostringstream oss;
+    oss << "./db/" << this->getUser() << ".xml";
+    std::string userprof = oss.str();
+
     std::vector<Locker*> lockerroom; //store a vector of lockers
     try {
         //load XML Database
         rapidxml::xml_document<> doc;
         rapidxml::xml_node<>* root_node;
     	// Read the xml file into a string vector
-        std::ifstream xmlFile("./db/prof.xml");
+        std::ifstream xmlFile(userprof);
         std::vector<char> buffer((std::istreambuf_iterator<char>(xmlFile)), std::istreambuf_iterator<char>());
 	    buffer.push_back('\0');
 		doc.parse<0>(&buffer[0]);
     	// Find our root node
     	root_node = doc.first_node("Lockerroom");
+
+        rapidxml::xml_node<>* user_prof_node = root_node->first_node("UserProfile");
+        setUser(user_prof_node->first_attribute("user")->value());
+        setPass(user_prof_node->first_attribute("pass")->value());
 
         // Iterate over the Lockers
         for (rapidxml::xml_node<>* locker_node = root_node->first_node("Locker"); locker_node; locker_node = locker_node->next_sibling()) {
@@ -189,6 +171,9 @@ std::vector<Locker*> Profiler::importFromXML() {
 }
 
 void Profiler::exportToXML(std::vector<Locker*> lockerroom) {
+    std::ostringstream oss;
+    oss << "./db/" << this->getUser() << ".xml";
+    std::string userprof = oss.str();
     //load XML Database
     rapidxml::xml_document<> doc;
     rapidxml::xml_node<>* decl = doc.allocate_node(rapidxml::node_declaration);
@@ -199,6 +184,12 @@ void Profiler::exportToXML(std::vector<Locker*> lockerroom) {
 
     //creating a pointer for the root note "Lockerroom"
     rapidxml::xml_node<>* root = doc.allocate_node(rapidxml::node_element, "Lockerroom");
+
+    //User profile node
+    rapidxml::xml_node<>* user_prof_node = doc.allocate_node(rapidxml::node_element, "UserProfile");
+    user_prof_node->append_attribute(doc.allocate_attribute("user", this->getUser().c_str()));
+    user_prof_node->append_attribute(doc.allocate_attribute("pass", this->getPass().c_str()));
+    root->append_node(user_prof_node);
 
     for (int i = 0; i < lockerroom.size(); i++) {
         rapidxml::xml_node<>* locker_node = doc.allocate_node(rapidxml::node_element, "Locker");
@@ -228,7 +219,7 @@ void Profiler::exportToXML(std::vector<Locker*> lockerroom) {
     doc.append_node(root);
     std::string xml_as_string;
     rapidxml::print(std::back_inserter(xml_as_string), doc);
-    std::ofstream fileStored("./db/prof.xml");
+    std::ofstream fileStored(userprof);
     fileStored << xml_as_string;
     fileStored.close();
     doc.clear();
