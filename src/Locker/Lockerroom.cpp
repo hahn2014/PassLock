@@ -76,7 +76,7 @@ bool Lockerroom::editLocker() {
     try {
         id = stoi(Log::getInput("Locker ID", 1, 64));
     } catch (...) {
-        std::cerr << "Invalid ID. Please use a valid integer!" << std::endl;
+        Log::Error("Invalid ID. Please use a valid integer!\n");
         return false;
     }
     //verify inputed ID is a valid Locker
@@ -115,7 +115,7 @@ bool Lockerroom::editLocker() {
             return true;
         }
     }
-    printf("Locker %d does not exist\n", id);
+    Log::Info("Locker %d does not exist\n", id);
     return false;
 }
 
@@ -146,7 +146,7 @@ void Lockerroom::getLockByID() {
         id = stoi(Log::getInput("Locker ID", 1, 64));
         //if you have > 64 chars worth of IDs then get help...
     } catch (...) {
-        std::cerr << "Invalid ID. Please use a valid integer!" << std::endl;
+        Log::Error("Invalid ID. Please use a valid integer!\n");
     }
 
     //find locker by ID
@@ -157,7 +157,7 @@ void Lockerroom::getLockByID() {
             return;
         }
     }
-    printf("Locker %d does not exist in the Lockerroom\n\n\n", id);
+    Log::Info("Locker %d does not exist in the Lockerroom\n\n\n", id);
 }
 
 void Lockerroom::getLockByName() {
@@ -180,7 +180,7 @@ void Lockerroom::getLockByName() {
         return; //found as many values as we could
     } //no names matched, break out of loop and notify user
 
-    printf("Locker %s does not exist in the Lockerroom\n\n\n", input.c_str());
+    Log::Info("Locker %s does not exist in the Lockerroom\n\n\n", input.c_str());
 }
 
 void Lockerroom::getLockByGroup() {
@@ -203,7 +203,7 @@ void Lockerroom::getLockByGroup() {
         return; //found as many values as we could
     } //no names matched, break out of loop and notify user
 
-    printf("Locker Group %s does not exist in the Lockerroom\n\n\n", input.c_str());
+    Log::Info("Locker Group %s does not exist in the Lockerroom\n\n\n", input.c_str());
 }
 
 void Lockerroom::deleteLocker() {
@@ -214,7 +214,7 @@ void Lockerroom::deleteLocker() {
         id = stoi(Log::getInput("Locker ID", 1, 64));
         //if you have > 64 chars worth of IDs then get help...
     } catch (...) {
-        std::cerr << "Invalid ID. Please use a valid integer!" << std::endl;
+        Log::Error("Invalid ID. Please use a valid integer!\n");
     }
 
     //find locker by ID
@@ -226,7 +226,7 @@ void Lockerroom::deleteLocker() {
             return;
         }
     }
-    printf("Locker %d does not exist in the Lockerroom\n\n\n", id);
+    Log::Info("Locker %d does not exist in the Lockerroom\n\n\n", id);
 }
 
 void Lockerroom::refactorIDIndex(int startindex) {
@@ -237,7 +237,7 @@ void Lockerroom::refactorIDIndex(int startindex) {
             lockerroom[i]->setID(tmp - 1); // move all IDs down by 1
         }
     } else {
-        printf("Locker %d was the end of the vector\n", startindex);
+        Log::Debug("Locker %d was the end of the vector, (nothing to refactor)\n", startindex);
     }
 }
 
@@ -254,14 +254,4 @@ void Lockerroom::setLockerroom(std::vector<Locker*> import) {
 
 std::vector<Locker*> Lockerroom::getLockerroom() {
     return this->lockerroom;
-}
-
-void Lockerroom::addGroup(std::string group) {
-    if (std::find(groups.begin(), groups.end(), group) != groups.end()) {
-        std::cout << "Grouping found";
-    }
-    else {
-        std::cout << "Grouping not found, adding...";
-        groups.push_back(group);
-    }
 }

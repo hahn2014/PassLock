@@ -2,7 +2,6 @@
 #include <vector>
 #include "Log.h"
 #include "Locker.h"
-#include "Hash.h"
 #include "rapidxml/rapidxml_utils.hpp"
 #include "rapidxml/rapidxml_print.hpp"
 

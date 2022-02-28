@@ -32,7 +32,6 @@ private:
     std::string user;
     std::vector<Locker*> lockerroom;
     std::string toLower(std::string);
-    std::vector<std::string> groups;
 };
 
 #endif

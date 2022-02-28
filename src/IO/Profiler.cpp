@@ -34,7 +34,7 @@ std::string Profiler::getProfileNames() {
     }
     if (profiles.size() == 0) return "0";
     //get user confirmation on which profile to load
-    printf("%lu user profiles were found:\n", profiles.size());
+    Log::Info("%lu user profiles were found:\n", profiles.size());
     for (int i = 0; i < profiles.size(); i++) {
         printf("- %s\n", profiles.at(i).c_str());
     }
@@ -64,10 +64,10 @@ void Profiler::createProfile() {
 
         //verify password is what the user wants
         if (password == Log::getInput("Confirm Password", 8, 64)) {
-            printf("Passwords match!\n\n");
+            Log::Info("Passwords match!\n\n");
             break;
         } else {
-            printf("Passwords did not match!\n");
+            Log::Error("Passwords did not match!\n");
         }
     }
     setUser(user);
@@ -98,7 +98,7 @@ std::vector<Locker*> Profiler::getLockerroom() {
     if (file_exists(userprof)) {
         return importFromXML(); //attempt to load
     } else {
-        printf("no user XML database was found... could not load a previously populated lockerroom\n\n");
+        Log::Info("no user XML database was found... could not load a previously populated lockerroom\n\n");
     }
     return {};
 }
@@ -111,9 +111,9 @@ void Profiler::saveLockerroom(std::vector<Locker*> lockerroom) {
     if (file_exists(userprof)) {
         //delete existing database export
         if (std::remove(userprof.c_str()) != 0)
-            perror("Error deleting old database\n\n");
+            Log::Error("Error deleting old database\n\n");
         else
-            puts("Outdated database successfully deleted\n\n");
+            Log::Info("Outdated database successfully deleted\n\n");
     }
     exportToXML(lockerroom); //create new updated database XML
 }
@@ -236,7 +236,7 @@ bool Profiler::dir_exists(std::string path) {
         return true; //valid dir
     } else {
         //no dir found
-        printf("%s was not found.. Creating new database directory\n", path.c_str());
+        Log::Info("%s was not found.. Creating new database directory\n", path.c_str());
         fs::create_directory(path); //create the db directory
         return true;
     }

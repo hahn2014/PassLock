@@ -1,10 +1,11 @@
 #include "Lockerroom.h"
 #include "Log.h"
 #include "Profiler.h"
+#include "Hash.h"
 
 static std::string VERSION = "1.0.5";
 static int MIN_MENU_OPTIONS = -1;
-static int MAX_MENU_OPTIONS = 9;
+static int MAX_MENU_OPTIONS = 10;
 
 Lockerroom lockers;
 Profiler userprof;
@@ -15,10 +16,10 @@ bool validMenuSelection(std::string inp) {
         try {
             int selection = std::stoi(inp);
             if (selection < MIN_MENU_OPTIONS) {
-                printf("No menu options bellow %i are available\n\n", MIN_MENU_OPTIONS);
+                Log::Info("No menu options bellow %i are available\n\n", MIN_MENU_OPTIONS);
                 throw 1;
             } else if (selection > MAX_MENU_OPTIONS) {
-                printf("No menu options above %i are available\n\n", MAX_MENU_OPTIONS);
+                Log::Info("No menu options above %i are available\n\n", MAX_MENU_OPTIONS);
                 throw -1;
             }
             return true;
@@ -66,7 +67,7 @@ int menuDelegator(std::string inp) {
         }
 
         case 0: {
-            printf("Updating user database\n\n");
+            Log::Info("Updating user database\n\n");
             userprof.saveLockerroom(lockers.getLockerroom());
             printf("Goodbye!\n\n");
             return 1; //exit clause
@@ -86,7 +87,7 @@ int menuDelegator(std::string inp) {
 
         case 3: {
             //Option 3 - Create NEW locker
-            if (lockers.createLocker()) printf("Successfully created new Locker\n\n\n");
+            if (lockers.createLocker()) Log::Info("Successfully created new Locker\n\n\n");
             return 0;
         }
 
@@ -98,7 +99,7 @@ int menuDelegator(std::string inp) {
 
         case 5: {
             //Option 5 - Edit Existing Locker (ID needed)
-            if (lockers.editLocker()) printf("Successfully updated Locker\n\n\n");
+            if (lockers.editLocker()) Log::Info("Successfully updated Locker\n\n\n");
             return 0;
         }
 
@@ -116,13 +117,18 @@ int menuDelegator(std::string inp) {
 
         case 8: {
             //Option 8 - Run GUI PassLock
-            printf("Last area of development.. Please give me some time\n");
+            Log::Debug("Last area of development.. Please give me some time\n");
             return 0;
         }
 
         case 9: {
             //Option 9 - seceret developer setting (generate random accounts)
             lockers.randLocks();
+            return 0;
+        }
+
+        case 10: {
+            Hash::test();
             return 0;
         }
     }
@@ -139,14 +145,14 @@ int main() {
         std::string testpass = Log::getInput("Master Password", 8, 64);
 
         if (testpass == userprof.getPass()) {
-            printf("Passwords match!\n\n");
+            Log::Info("Passwords match!\n\n");
         } else {
-            printf("Invalid password..\nShutting down.\n");
+            Log::Error("Invalid password..\nShutting down.\n");
             return -1;
         }
 
     } else {
-        std::cerr << "Unexpected error occured while loading user profile." << std::endl;
+        Log::Error("Unexpected error occured while loading user profile.\n");
         return -1;
     }
 

@@ -1,16 +1,31 @@
 #include "Log.h"
 
 
-void Log::Debug() {
+void Log::Debug(const char* fmt, ...) {
+    va_list arg;
+    va_start(arg, fmt);
 
+    printf(KMAG "[DEBUG]: " KWHT);
+    vprintf(fmt, arg);
+    va_end(arg);
 }
 
-void Log::Info() {
+void Log::Info(const char* fmt, ...) {
+    va_list arg;
+    va_start(arg, fmt);
 
+    printf(KGRN "[INFO]: " KWHT);
+    vprintf(fmt, arg);
+    va_end(arg);
 }
 
-void Log::Error() {
+void Log::Error(const char* fmt, ...) {
+    va_list arg;
+    va_start(arg, fmt);
 
+    printf(KRED "[ERROR]: " KWHT);
+    vprintf(fmt, arg);
+    va_end(arg);
 }
 
 void Log::printHelp() {
@@ -26,6 +41,7 @@ void Log::printHelp() {
     printf("7 - Get Locker ID (Name Needed)\n");
     printf("8 - Run GUI PassLock\n");
     printf("9 - Developer test: Generate random lockers\n");
+    printf("10 - Developer test: Generate hash value\n");
 }
 
 std::string Log::getInput(std::string prompt, int min, int max) {
@@ -38,9 +54,9 @@ std::string Log::getInput(std::string prompt, int min, int max) {
         if (input.length() >= min && input.length() <= max) {
             return input;
         } else if (input.length() < min) {
-            printf("%s min length not met. %s must be at least %d characters.\n\n", prompt.c_str(), prompt.c_str(), min);
+            Error("%s min length not met. %s must be at least %d characters.\n\n", prompt.c_str(), prompt.c_str(), min);
         } else if (input.length() > max) {
-            printf("%s max length exceeded. %s must be less than %d characters.\n\n", prompt.c_str(), prompt.c_str(), max);
+            Error("%s max length exceeded. %s must be less than %d characters.\n\n", prompt.c_str(), prompt.c_str(), max);
         }
     }
     return "";
