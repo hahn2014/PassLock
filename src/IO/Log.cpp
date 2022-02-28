@@ -15,7 +15,8 @@ void Log::Error() {
 
 void Log::printHelp() {
     printf("\nWelcome to the PassLock help portal!\n\n");
-    printf("0 - Exit Program\n");
+    printf("<< -1 >> Exit without saving\n");
+    printf("0 - Save and Exit Program\n");
     printf("1 - List ALL lockers\n");
     printf("2 - List ALL lockers by grouping\n");
     printf("3 - Create NEW locker\n");
@@ -25,7 +26,6 @@ void Log::printHelp() {
     printf("7 - Get Locker ID (Name Needed)\n");
     printf("8 - Run GUI PassLock\n");
     printf("9 - Developer test: Generate random lockers\n");
-    printf("10 - Developer test: Export database to XML\n\n\n");
 }
 
 std::string Log::getInput(std::string prompt, int min, int max) {
