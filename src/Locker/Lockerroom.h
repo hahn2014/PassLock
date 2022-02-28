@@ -1,12 +1,9 @@
 #ifndef LOCKERROOM_H
 #define LOCKERROOM_H
 
+#include <vector>
 #include "Locker.h"
 #include "Log.h"
-#include <iostream>
-#include <vector>
-#include <stdio.h>
-#include <sstream>
 
 class Lockerroom {
 public:

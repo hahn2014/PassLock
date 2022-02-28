@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <iostream>
-#include <string>
-#include <locale>         // std::locale, std::tolower
 #include "Lockerroom.h"
 #include "Log.h"
 #include "Profiler.h"
