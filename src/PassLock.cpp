@@ -1,9 +1,9 @@
-#include "Lockerroom.h"
-#include "Log.h"
-#include "Profiler.h"
-#include "Hash.h"
+#include "Locker/Lockerroom.h"
+#include "IO/Log.h"
+#include "IO/Profiler.h"
+#include "Security/Hash.h"
 
-static std::string VERSION = "1.0.5";
+static std::string VERSION = "1.0.6";
 static int MIN_MENU_OPTIONS = -1;
 static int MAX_MENU_OPTIONS = 10;
 
