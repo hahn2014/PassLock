@@ -1,5 +1,7 @@
 #include "Hash.h"
 
+// credit where credit is due: https://crypto.stackexchange.com/questions/32648/questions-about-a-sha3-cipher-stream-encryption-scheme
+
 std::string Hash::hashUserPass(std::string user, std::string pass) {
     CryptoPP::SHA256 hash;
     CryptoPP::byte digest[CryptoPP::SHA256::DIGESTSIZE];

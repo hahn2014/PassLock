@@ -22,9 +22,11 @@ public:
     void static Error(const char* fmt, ...);
     void static printHelp();
     std::string static getInput(std::string, int, int);
+    bool static getDev();
 
 private:
     std::string static calculateSpaces(std::string);
+    const static bool isDev = false; //This value MUST be false on release
 };
 
 #endif

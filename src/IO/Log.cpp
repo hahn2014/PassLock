@@ -2,12 +2,14 @@
 
 
 void Log::Debug(const char* fmt, ...) {
-    va_list arg;
-    va_start(arg, fmt);
+    if (Log::getDev()) {
+        va_list arg;
+        va_start(arg, fmt);
 
-    printf(KMAG "[DEBUG]: " KWHT);
-    vprintf(fmt, arg);
-    va_end(arg);
+        printf(KMAG "[DEBUG]: " KWHT);
+        vprintf(fmt, arg);
+        va_end(arg);
+    }
 }
 
 void Log::Info(const char* fmt, ...) {
@@ -69,4 +71,8 @@ std::string Log::calculateSpaces(std::string prompt) {
         spaces << " ";
     }
     return spaces.str();
+}
+
+bool Log::getDev() {
+    return isDev;
 }

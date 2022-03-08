@@ -6,7 +6,6 @@
 static std::string VERSION = "1.0.6";
 static int MIN_MENU_OPTIONS = -1;
 static int MAX_MENU_OPTIONS = 10;
-static bool dev = true;
 
 Lockerroom lockers;
 Profiler userprof;
@@ -124,12 +123,16 @@ int menuDelegator(std::string inp) {
 
         case 9: {
             //Option 9 - seceret developer setting (generate random accounts)
-            lockers.randLocks();
+            if (Log::getDev()) {
+                lockers.randLocks();
+            }
             return 0;
         }
 
         case 10: {
-            Log::Info("Hashed UserPass: %s\n", Hash::hashUserPass(userprof.getUser(), userprof.getPass()).c_str());
+            if (Log::getDev()) {
+                Log::Info("Hashed UserPass: %s\n", Hash::hashUserPass(userprof.getUser(), userprof.getPass()).c_str());
+            }
             return 0;
         }
     }
@@ -143,7 +146,7 @@ int main() {
         user = userprof.getUser();
 
 
-        if (dev == false) { //we need to remove this on final release, there should be 0 backdoors to the service
+        if (Log::getDev() == false) { //we need to remove this on final release, there should be 0 backdoors to the service
             //confirm master password to gain access
             printf("\nHello, %s. Please confirm master password\n", user.c_str());
             std::string testpass = Log::getInput("Master Password", 8, 64);
