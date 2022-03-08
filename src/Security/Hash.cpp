@@ -1,64 +1,28 @@
 #include "Hash.h"
 
-Hash::Hash() {
+std::string Hash::hashUserPass(std::string user, std::string pass) {
+    CryptoPP::SHA256 hash;
+    CryptoPP::byte digest[CryptoPP::SHA256::DIGESTSIZE];
+    std::string salt, output;
 
+    //create the username and password salt
+    salt = user + pass;
+    hash.CalculateDigest(digest, (const CryptoPP::byte*)salt.c_str(), salt.size());
+
+    CryptoPP::HexEncoder encoder;
+    CryptoPP::StringSink* SS = new CryptoPP::StringSink(output);
+    encoder.Attach(SS);
+    encoder.Put(digest, sizeof(digest));
+    encoder.MessageEnd();
+
+    return output;
 }
 
-void Hash::test() {
-    // static constexpr size_t AES_KEY_SIZE = 256 / 8; //AES-256
-    //
-    // const std::string input {"This is a secret message."};
-    // std::vector<uint8_t> key(AES_KEY_SIZE);
-    // std::vector<uint8_t> iv(CryptoPP::AES::BLOCKSIZE);
-    //
-    // CryptoPP::BlockingRng rand;
-    // rand.GenerateBlock(key.data(), key.size());
-    // rand.GenerateBlock(iv.data(), iv.size());
-    //
-    // auto cipher = Hash::encrypt(input, key, iv);
-    // auto plain_text = Hash::decrypt(cipher, key, iv);
-    //
-    // if (plain_text != input) {
-    //     std::cout << "Error: plain text doesn't match the input" << std::endl;
-    // }
-}
+void Hash::hashFile(char* filename) {
+    CryptoPP::SHA256 hash;
+    std::string digest;
 
-// std::string Hash::encrypt(const std::string& input, const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv) {
-//     std::string cipher;
-//
-//     auto aes = CryptoPP::AES::Encryption(key.data(), key.size());
-//     auto aes_cbc = CryptoPP::CBC_Mode_ExternalCipher::Encryption(aes, iv.data());
-//
-//     CryptoPP::StringSource ss(
-//         input,
-//         true,
-//         new CryptoPP::StreamTransformationFilter(
-//             aes_cbc,
-//             new CryptoPP::Base64Encoder(
-//                 new CryptoPP::StringSink(cipher)
-//             )
-//         )
-//     );
-//
-//     return cipher;
-// }
-//
-// std::string Hash::decrypt(const std::string& cipher_text, const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv) {
-//     std::string plain_text;
-//
-//     auto aes = CryptoPP::AES::Decryption(key.data(), key.size());
-//     auto aes_cbc = CryptoPP::CBC_Mode_ExternalCipher::Decryption(aes, iv.data());
-//
-//     CryptoPP::StringSource ss(
-//         cipher_text,
-//         true,
-//         new CryptoPP::Base64Decoder(
-//             new CryptoPP::StreamTransformationFilter(
-//                 aes_cbc,
-//                 new CryptoPP::StringSink(plain_text)
-//             )
-//         )
-//     );
-//
-//     return plain_text;
-// }
+    CryptoPP::FileSource f(filename, true, new CryptoPP::HashFilter(hash, new CryptoPP::HexEncoder(new CryptoPP::StringSink(digest))));
+
+    std::cout << digest << std::endl;
+}

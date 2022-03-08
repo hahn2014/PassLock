@@ -17,7 +17,6 @@
 
 class Log {
 public:
-
     void static Debug(const char* fmt, ...);
     void static Info(const char* fmt, ...);
     void static Error(const char* fmt, ...);
@@ -26,7 +25,6 @@ public:
 
 private:
     std::string static calculateSpaces(std::string);
-
 };
 
 #endif

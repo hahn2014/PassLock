@@ -1,6 +1,9 @@
 # ignore user data
 /db/
 
+# ignore cryptopp testdata
+/lib/cryptopp/share
+
 # Prerequisites
 *.d
 
@@ -28,7 +31,6 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
 *.lib
 
 # Executables

@@ -123,6 +123,7 @@ std::vector<Locker*> Profiler::importFromXML() {
     std::ostringstream oss;
     oss << "./db/" << this->getUser() << ".xml";
     std::string userprof = oss.str();
+    Log::Debug("Importing from XML Database: %s\n", oss.str().c_str());
 
     std::vector<Locker*> lockerroom; //store a vector of lockers
     try {
@@ -140,6 +141,8 @@ std::vector<Locker*> Profiler::importFromXML() {
         rapidxml::xml_node<>* user_prof_node = root_node->first_node("UserProfile");
         setUser(user_prof_node->first_attribute("user")->value());
         setPass(user_prof_node->first_attribute("pass")->value());
+        Log::Debug("Profile User: %s\n", user_prof_node->first_attribute("user")->value());
+        Log::Debug("Profile Pass: %s\n", user_prof_node->first_attribute("pass")->value());
 
         // Iterate over the Lockers
         for (rapidxml::xml_node<>* locker_node = root_node->first_node("Locker"); locker_node; locker_node = locker_node->next_sibling()) {
@@ -154,6 +157,13 @@ std::vector<Locker*> Profiler::importFromXML() {
             rapidxml::xml_node<>* user_node = locker_node->first_node("User");
             l->setUsername(user_node->first_attribute("user")->value());
             l->setPassword(user_node->first_attribute("pass")->value());
+
+            Log::Debug("\tLocker Name : %s\n", locker_node->first_attribute("name")->value());
+            Log::Debug("\tLocker URL  : %s\n", locker_node->first_attribute("url")->value());
+            Log::Debug("\tLocker Group: %s\n", locker_node->first_attribute("grouping")->value());
+            Log::Debug("\tLocker ID   : %s\n", locker_node->first_attribute("id")->value());
+            Log::Debug("\t\tLocker User: %s\n", user_node->first_attribute("user")->value());
+            Log::Debug("\t\tLocker Pass: %s\n", user_node->first_attribute("pass")->value());
 
             lockerroom.push_back(l); //add new locker to lockerroom vector
         }
@@ -171,9 +181,11 @@ std::vector<Locker*> Profiler::importFromXML() {
 }
 
 void Profiler::exportToXML(std::vector<Locker*> lockerroom) {
+    Log::Debug("");
     std::ostringstream oss;
     oss << "./db/" << this->getUser() << ".xml";
     std::string userprof = oss.str();
+    Log::Debug("Exporting to XML Database: %s\n", oss.str().c_str());
     //load XML Database
     rapidxml::xml_document<> doc;
     rapidxml::xml_node<>* decl = doc.allocate_node(rapidxml::node_declaration);
@@ -187,9 +199,13 @@ void Profiler::exportToXML(std::vector<Locker*> lockerroom) {
 
     //User profile node
     rapidxml::xml_node<>* user_prof_node = doc.allocate_node(rapidxml::node_element, "UserProfile");
-    user_prof_node->append_attribute(doc.allocate_attribute("user", this->getUser().c_str()));
-    user_prof_node->append_attribute(doc.allocate_attribute("pass", this->getPass().c_str()));
+    char* user_name = doc.allocate_string(this->getUser().c_str());
+    char* user_pass = doc.allocate_string(this->getPass().c_str());
+    user_prof_node->append_attribute(doc.allocate_attribute("user", user_name));
+    user_prof_node->append_attribute(doc.allocate_attribute("pass", user_pass));
     root->append_node(user_prof_node);
+    Log::Debug("Profile User: %s\n", user_prof_node->first_attribute("user")->value());
+    Log::Debug("Profile Pass: %s\n", user_prof_node->first_attribute("pass")->value());
 
     for (int i = 0; i < lockerroom.size(); i++) {
         rapidxml::xml_node<>* locker_node = doc.allocate_node(rapidxml::node_element, "Locker");
@@ -210,6 +226,13 @@ void Profiler::exportToXML(std::vector<Locker*> lockerroom) {
         char* lock_pass = doc.allocate_string(lockerroom.at(i)->getPassword().c_str());
         user_node->append_attribute(doc.allocate_attribute("user", lock_user));
         user_node->append_attribute(doc.allocate_attribute("pass", lock_pass));
+
+        Log::Debug("\tLocker Name : %s\n", locker_node->first_attribute("name")->value());
+        Log::Debug("\tLocker URL  : %s\n", locker_node->first_attribute("url")->value());
+        Log::Debug("\tLocker Group: %s\n", locker_node->first_attribute("grouping")->value());
+        Log::Debug("\tLocker ID   : %s\n", locker_node->first_attribute("id")->value());
+        Log::Debug("\t\tLocker User: %s\n", user_node->first_attribute("user")->value());
+        Log::Debug("\t\tLocker Pass: %s\n", user_node->first_attribute("pass")->value());
 
         //populate current iteration of locker node
         locker_node->append_node(user_node);

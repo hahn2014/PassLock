@@ -6,6 +6,7 @@
 static std::string VERSION = "1.0.6";
 static int MIN_MENU_OPTIONS = -1;
 static int MAX_MENU_OPTIONS = 10;
+static bool dev = true;
 
 Lockerroom lockers;
 Profiler userprof;
@@ -128,7 +129,7 @@ int menuDelegator(std::string inp) {
         }
 
         case 10: {
-            Hash::test();
+            Log::Info("Hashed UserPass: %s\n", Hash::hashUserPass(userprof.getUser(), userprof.getPass()).c_str());
             return 0;
         }
     }
@@ -140,15 +141,19 @@ int main() {
     if (userprof.startup()) {
         userprof.importFromXML();
         user = userprof.getUser();
-        //confirm master password to gain access
-        printf("\nHello, %s. Please confirm master password\n", user.c_str());
-        std::string testpass = Log::getInput("Master Password", 8, 64);
 
-        if (testpass == userprof.getPass()) {
-            Log::Info("Passwords match!\n\n");
-        } else {
-            Log::Error("Invalid password..\nShutting down.\n");
-            return -1;
+
+        if (dev == false) { //we need to remove this on final release, there should be 0 backdoors to the service
+            //confirm master password to gain access
+            printf("\nHello, %s. Please confirm master password\n", user.c_str());
+            std::string testpass = Log::getInput("Master Password", 8, 64);
+
+            if (testpass == userprof.getPass()) {
+                Log::Info("Passwords match!\n\n");
+            } else {
+                Log::Error("Invalid password..\nShutting down.\n");
+                return -1;
+            }
         }
 
     } else {

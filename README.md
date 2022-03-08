@@ -42,6 +42,7 @@ Open Source is the best form of software development. I welcome anyone to fork m
     - [x] Choice between multiple profile databases at startup
 - [ ] Password hashing and encryption
     - [ ] SHA3-256 SHA3-512 Hashing Algorithm implementation
+        - [x] Basic hashing backend structure (Crypto++ Library)
         - [ ] Initial hash compare to verify user password with hashfile
         - [ ] XML database hashing
 - [ ] Simple Graphical User Interface implementation
