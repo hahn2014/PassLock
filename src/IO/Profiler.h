@@ -1,7 +1,7 @@
 #include <sys/stat.h>
 #include <vector>
 #include "Log.h"
-#include "Locker.h"
+#include "Locker/Locker.h"
 #include "rapidxml/rapidxml_utils.hpp"
 #include "rapidxml/rapidxml_print.hpp"
 

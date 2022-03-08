@@ -57,4 +57,9 @@ Open Source is the best form of software development. I welcome anyone to fork m
 Compiling from source code should be as simple as calling `make` in the root directory. If you are unable to compile using the provided makefile, try the `gcc` compiler command below.
 
 
-gcc -std=c++17 -I/src/IO/ -I/src/Locker/ -g -v ./src/*.cpp -o ./build/PassLock
+- **GCC CLI Compiling**
+
+Firstly, we need to make the build dir to compile all our .o files into. Enter this into your terminal: `mkdir build`
+
+Then, we can call the compilation statement:
+`gcc -I./src/IO/ -I./src/Locker/ -I./src/Security/ -I./lib/rapidxml/ -std=c++17 -c ./src/PassLock.cpp -O1 -g -v -o ./build/PassLock`

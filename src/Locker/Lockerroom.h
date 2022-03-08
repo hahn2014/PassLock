@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "Locker.h"
-#include "Log.h"
+#include "IO/Log.h"
 
 class Lockerroom {
 public:
