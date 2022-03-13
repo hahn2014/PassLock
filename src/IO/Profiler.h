@@ -8,24 +8,25 @@
 
 class Profiler {
 public:
-    Profiler();
     bool startup();
     std::string getProfileNames();
     void createProfile();
 
     std::vector<Locker*> importFromXML();
     void exportToXML(std::vector<Locker*>);
+    std::string getProfileHash();
 
-    std::vector<Locker*> getLockerroom();
+    // Getters and Setters
     void saveLockerroom(std::vector<Locker*>);
-    std::string getUser();
+    void setHash(std::string);
     void setUser(std::string);
-    std::string getPass();
-    void setPass(std::string);
+    std::vector<Locker*> getLockerroom();
+    std::string getHash();
+    std::string getUser();
 
     //profile variables
     std::string user;
-    std::string pass;
+    std::string hash;
 
 private:
     bool file_exists(std::string);

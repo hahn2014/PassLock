@@ -3,7 +3,7 @@
 #include "IO/Profiler.h"
 #include "Security/Hash.h"
 
-static std::string VERSION = "1.0.6";
+static std::string VERSION = "1.1.0";
 static int MIN_MENU_OPTIONS = -1;
 static int MAX_MENU_OPTIONS = 10;
 
@@ -12,29 +12,30 @@ Profiler userprof;
 std::string user;
 
 bool validMenuSelection(std::string inp) {
-    if (inp != "-h") { //help command
-        try {
-            int selection = std::stoi(inp);
-            if (selection < MIN_MENU_OPTIONS) {
-                Log::Info("No menu options bellow %i are available\n\n", MIN_MENU_OPTIONS);
-                throw 1;
-            } else if (selection > MAX_MENU_OPTIONS) {
-                Log::Info("No menu options above %i are available\n\n", MAX_MENU_OPTIONS);
-                throw -1;
-            }
-            return true;
-        } // Standard exceptions for stoi
-        catch (const std::invalid_argument& e) {
-            std::cout << e.what() << "\n";
-        }
-        catch (const std::out_of_range& e) {
-            std::cout << e.what() << "\n";
-        }
-        catch (...) {
-            return false;
-        }
+    if (inp == "-h") { //help command
+        return true;
     }
-    return true;
+    try {
+        int selection = std::stoi(inp);
+        if (selection < MIN_MENU_OPTIONS) {
+            Log::Info("No menu options bellow %i are available\n\n", MIN_MENU_OPTIONS);
+            throw 1;
+        } else if (selection > MAX_MENU_OPTIONS) {
+            Log::Info("No menu options above %i are available\n\n", MAX_MENU_OPTIONS);
+            throw -1;
+        }
+        return true;
+    } // Standard exceptions for stoi
+    catch (const std::invalid_argument& e) {
+        std::cout << e.what() << "\n";
+    }
+    catch (const std::out_of_range& e) {
+        std::cout << e.what() << "\n";
+    }
+    catch (...) {
+        return false;
+    }
+    return false;
 }
 
 bool interp(std::string responce) {
@@ -87,7 +88,8 @@ int menuDelegator(std::string inp) {
 
         case 3: {
             //Option 3 - Create NEW locker
-            if (lockers.createLocker()) Log::Info("Successfully created new Locker\n\n\n");
+            if (lockers.createLocker())
+                Log::Info("Successfully created new Locker\n\n\n");
             return 0;
         }
 
@@ -99,7 +101,8 @@ int menuDelegator(std::string inp) {
 
         case 5: {
             //Option 5 - Edit Existing Locker (ID needed)
-            if (lockers.editLocker()) Log::Info("Successfully updated Locker\n\n\n");
+            if (lockers.editLocker())
+                Log::Info("Successfully updated Locker\n\n\n");
             return 0;
         }
 
@@ -117,7 +120,7 @@ int menuDelegator(std::string inp) {
 
         case 8: {
             //Option 8 - Run GUI PassLock
-            Log::Debug("Last area of development.. Please give me some time\n");
+            Log::Error("Last area of development.. Please give me some time\n");
             return 0;
         }
 
@@ -131,7 +134,18 @@ int menuDelegator(std::string inp) {
 
         case 10: {
             if (Log::getDev()) {
-                Log::Info("Hashed UserPass: %s\n", Hash::hashUserPass(userprof.getUser(), userprof.getPass()).c_str());
+                std::string hash = userprof.getHash();
+                Log::Info("Hashed UserPass: %s\n", hash.c_str());
+                Log::Info("Test Encryption:\n");
+                std::string user_encr = Hash::encrypt("HahnSolo", hash);
+                std::string pass_encr = Hash::encrypt("test_password", hash);
+                Log::Info("User: %s\n", user_encr.c_str());
+                Log::Info("Pass: %s\n", pass_encr.c_str());
+                Log::Info("Test Decryption:\n");
+                std::string user = Hash::decrypt(user_encr, hash);
+                std::string pass = Hash::decrypt(pass_encr, hash);
+                Log::Info("User: %s\n", user.c_str());
+                Log::Info("Pass: %s\n", pass.c_str());
             }
             return 0;
         }
@@ -142,21 +156,21 @@ int menuDelegator(std::string inp) {
 int main() {
     //load in user profile (/db/user.ini)
     if (userprof.startup()) {
-        userprof.importFromXML();
         user = userprof.getUser();
+        std::string profile_hash = userprof.getProfileHash(); //only import profile hash from db
+        //update userprofile with imported hash
+        userprof.setHash(profile_hash);
 
+        printf("\nHello, %s. Please confirm master password\n", user.c_str());
+        std::string input = Log::getInput("Master Password", 8, 64);
+        std::string input_hash = Hash::hashUserPass(user, input); //hash user&pass
 
-        if (Log::getDev() == false) { //we need to remove this on final release, there should be 0 backdoors to the service
-            //confirm master password to gain access
-            printf("\nHello, %s. Please confirm master password\n", user.c_str());
-            std::string testpass = Log::getInput("Master Password", 8, 64);
-
-            if (testpass == userprof.getPass()) {
-                Log::Info("Passwords match!\n\n");
-            } else {
-                Log::Error("Invalid password..\nShutting down.\n");
-                return -1;
-            }
+        //compare hash from profile xml to user inputed hash conversion
+        if (Hash::compareHash(profile_hash, input_hash)) {
+            Log::Info("Passwords match!\n\n");
+        } else {
+            Log::Error("Invalid password..\nShutting down.\n");
+            return -1;
         }
 
     } else {
@@ -170,6 +184,7 @@ int main() {
 
     //initialize Lockerroom
     lockers.setUser(user);
+    lockers.setHash(userprof.getHash());
 
     //load user database
     lockers.setLockerroom(userprof.getLockerroom());
@@ -192,6 +207,8 @@ int main() {
             } else if (menuStatus == 1) {
                 return 0;
             }
+        } else {
+            Log::Error("Invalid menu option %s\n\n", input.c_str());
         }
     }
     return 0;

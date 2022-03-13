@@ -9,11 +9,13 @@ Locker::Locker() {
 
 void Locker::createLocker() {
     int maxchar = 64;
-    lock = (struct locker*)malloc(sizeof(struct locker) + sizeof(char) * maxchar);
+    lock = (struct locker*)malloc(sizeof(struct locker) + ((sizeof(std::string) * maxchar) * 5) + sizeof(int));
 }
 
-void Locker::printLocker() {
-    printf("Locker [%d: %s]: %s (User: %s) -> {%s}\n", lock->id, lock->group.c_str(), lock->name.c_str(), lock->username.c_str(), lock->url.c_str());
+void Locker::printLocker(std::string hash) {
+    std::string user = Hash::decrypt(lock->username, hash);
+    std::string pass = Hash::decrypt(lock->password, hash);
+    printf("Locker [%d: %s]: %s (User: %s  Pass: %s) -> {%s}\n", lock->id, lock->group.c_str(), lock->name.c_str(), user.c_str(), pass.c_str(), lock->url.c_str());
 }
 
 //

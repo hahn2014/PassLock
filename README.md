@@ -1,4 +1,4 @@
-# PassLock
+# PassLock v1.1.0
 
 ### Welcome to PassLock, the all-encompassing *Local Password Manager*.
 PassLock is a portable database manager with industry-standard password hashing security. Developed by [@hahn2014](https://github.com/hahn2014/) in order to get around the paywalls being put in place on most Online Password Manager alternatives (LastPass, OnePass, etc...). PassLock is free and always will be. Period. While I am tempted to implement a cross-platform syncing function (and even more convenient, phone app with sync), I am committed to the concept of local storage. Data is incredibly valuable, not only to my users but to anyone attempting to access said data. Keeping the user's credentials locally stored and encrypted guarantees privacy and safety. An encrypted database export is a possible option in the future for cross-platform syncing; however, this *fix* would only be a temporary solution to the syncing dilemma.
@@ -41,13 +41,15 @@ Open Source is the best form of software development. I welcome anyone to fork m
     - [x] Exclusive XML database parsing
     - [x] Choice between multiple profile databases at startup
 - [ ] Password hashing and encryption
-    - [ ] SHA3-256 SHA3-512 Hashing Algorithm implementation
+    - [x] SHA3-256 SHA3-512 Hashing Algorithm implementation
         - [x] Basic hashing backend structure (Crypto++ Library)
-        - [ ] Initial hash compare to verify user password with hashfile
-        - [ ] XML database hashing
+        - [x] Initial hash compare to verify user password with hashfile
+    - [x] XML database encryption
+        - [x] Username and Password credentials stored as encrypted values
+        - [x] Decryption called when requesting locker information
 - [ ] Simple Graphical User Interface implementation
+- [ ] Press TAB to auto-fill contextual user input querries
 - [ ] Multi-platform executable ports
-- [ ] Database encrypted export/import
 - [ ] More to come...
 
 ---

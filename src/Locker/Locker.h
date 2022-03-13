@@ -2,12 +2,13 @@
 #define LOCKER_H
 
 #include <string>
+#include "Security/Hash.h"
 
 class Locker {
 public:
     Locker();
     //DEBUG for testing, should not be accessible in the future
-    void printLocker();
+    void printLocker(std::string);
 
     // getters and setters
     int getID();
@@ -25,11 +26,11 @@ public:
     void setGroup(std::string);
 
     struct locker {
+        int id;
         std::string name;
         std::string username;
         std::string password;
         std::string url;
-        int id;
         std::string group; //grouping filter
     };
 

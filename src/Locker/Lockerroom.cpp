@@ -22,7 +22,7 @@ Lockerroom::~Lockerroom() {
 void Lockerroom::printLockerroom() {
     printf("\n--- %s Lockerroom ---\n", this->user.c_str());
     for (int i = 0; i < lockerroom.size(); i++) {
-        lockerroom[i]->printLocker();
+        lockerroom[i]->printLocker(this->hash);
     }
     if (lockerroom.size() == 0) {
         printf("There is nothing here yet...\n\n");
@@ -56,12 +56,12 @@ bool Lockerroom::createLocker() {
     //get username
     input = ""; //input reset
     input = Log::getInput("Locker Username", 3, 64);
-    l->setUsername(input);
+    l->setUsername(Hash::encrypt(input, this->hash));
 
     //get password
-    // input = "";
-    // input = Log::getInput("Locker Password", 8, 128);
-    // l->setPassword(input);
+    input = "";
+    input = Log::getInput("Locker Password", 8, 128);
+    l->setPassword(Hash::encrypt(input, this->hash));
 
     //update lockerroom with new locker
     lockerroom.push_back(l);
@@ -72,6 +72,7 @@ bool Lockerroom::editLocker() {
     int id;
     Locker* l = new Locker();
     std::string input;
+    printf("\n--- Locker Editor ---\n");
     //step 1 get the locker by ID
     try {
         id = stoi(Log::getInput("Locker ID", 1, 64));
@@ -80,11 +81,10 @@ bool Lockerroom::editLocker() {
         return false;
     }
     //verify inputed ID is a valid Locker
-    for (int i = 0; i < lockerroom.size(); i++) {
+    for (int i = 1; i < lockerroom.size(); i++) {
         if (lockerroom.at(i)->getID() == id) {
+            Log::Debug("Locker ID %i was found in the Lockerroom\n", id);
             l->setID(id);
-
-            printf("\n--- Locker Editor {%d} ---\n", id);
 
             //get name
             input = ""; //input reset
@@ -104,18 +104,18 @@ bool Lockerroom::editLocker() {
             //get username
             input = ""; //input reset
             input = Log::getInput("Locker Username", 3, 64);
-            l->setUsername(input);
+            l->setUsername(Hash::encrypt(input, this->hash));
 
             //get password
-            // input = "";
-            // input = Log::getInput("Locker Password", 8, 128);
-            // l->setPassword(input);
+            input = "";
+            input = Log::getInput("Locker Password", 8, 128);
+            l->setPassword(Hash::encrypt(input, this->hash));
 
-            lockerroom.at(id) = l;
+            lockerroom.at(i) = l;
             return true;
         }
     }
-    Log::Info("Locker %d does not exist\n", id);
+    Log::Error("Locker %d does not exist\n", id);
     return false;
 }
 
@@ -125,13 +125,14 @@ void Lockerroom::randLocks() {
         Locker* l = new Locker();
 
         std::stringstream ss;
-        ss << "test" << i;
+        ss << "test" << lockercount;
 
         l->setName(ss.str());
         l->setID(lockercount);
         l->setURL("www.github.com/hahn2014");
         l->setGroup("Programming");
-        l->setUsername("HahnSolo");
+        l->setUsername(Hash::encrypt("HahnSolo", this->hash));
+        l->setPassword(Hash::encrypt("test_password", this->hash));
 
         lockerroom.push_back(l);
     }
@@ -140,7 +141,7 @@ void Lockerroom::randLocks() {
 void Lockerroom::getLockByID() {
     int id = 0;
     std::string input;
-    printf("\n--- Locker ID Querry ---\n");
+    printf("\n--- Locker Name Querry ---\n");
 
     try {
         id = stoi(Log::getInput("Locker ID", 1, 64));
@@ -152,18 +153,18 @@ void Lockerroom::getLockByID() {
     //find locker by ID
     for (int i = 0; i < lockerroom.size(); i++) {
         if (lockerroom[i]->getID() == id) {
-            lockerroom[i]->printLocker();
+            lockerroom[i]->printLocker(this->hash);
             printf("\n\n");
             return;
         }
     }
-    Log::Info("Locker %d does not exist in the Lockerroom\n\n\n", id);
+    Log::Error("Locker ID %d does not exist in the Lockerroom\n\n\n", id);
 }
 
 void Lockerroom::getLockByName() {
     std::string input;
     int namematch = 0;
-    printf("\n--- Locker Name Querry ---\n");
+    printf("\n--- Locker ID Querry ---\n");
 
     input = ""; //input reset
     input = Log::getInput("Locker Name", 2, 64);
@@ -171,7 +172,8 @@ void Lockerroom::getLockByName() {
     //find locker by Name
     for (int i = 0; i < lockerroom.size(); i++) {
         if (lockerroom[i]->getName() == input) {
-            lockerroom[i]->printLocker();
+            printf("%s Locker ID: %i", input.c_str(), lockerroom[i]->getID());
+            //lockerroom[i]->printLocker(this->hash);
             namematch++;
         }
     }
@@ -180,7 +182,7 @@ void Lockerroom::getLockByName() {
         return; //found as many values as we could
     } //no names matched, break out of loop and notify user
 
-    Log::Info("Locker %s does not exist in the Lockerroom\n\n\n", input.c_str());
+    Log::Error("Locker %s does not exist in the Lockerroom\n\n\n", input.c_str());
 }
 
 void Lockerroom::getLockByGroup() {
@@ -194,7 +196,7 @@ void Lockerroom::getLockByGroup() {
     //find locker by Group
     for (int i = 0; i < lockerroom.size(); i++) {
         if (lockerroom[i]->getGroup() == input) {
-            lockerroom[i]->printLocker();
+            lockerroom[i]->printLocker(this->hash);
             groupmatch++;
         }
     }
@@ -203,7 +205,7 @@ void Lockerroom::getLockByGroup() {
         return; //found as many values as we could
     } //no names matched, break out of loop and notify user
 
-    Log::Info("Locker Group %s does not exist in the Lockerroom\n\n\n", input.c_str());
+    Log::Error("Locker Group %s does not exist in the Lockerroom\n\n\n", input.c_str());
 }
 
 void Lockerroom::deleteLocker() {
@@ -221,12 +223,13 @@ void Lockerroom::deleteLocker() {
     for (int i = 0; i < lockerroom.size(); i++) {
         if (lockerroom[i]->getID() == id) {
             lockerroom.erase(lockerroom.begin() + i);
+            lockercount -= 1; //update lockerroom size
             refactorIDIndex(i); //fix ID index for lockers i+1 and above (if any)
-            printf("Locker Deleted!\n\n\n");
+            Log::Info("Locker deleted!\n\n");
             return;
         }
     }
-    Log::Info("Locker %d does not exist in the Lockerroom\n\n\n", id);
+    Log::Error("Locker ID %d does not exist in the Lockerroom\n\n\n", id);
 }
 
 void Lockerroom::refactorIDIndex(int startindex) {
@@ -243,6 +246,10 @@ void Lockerroom::refactorIDIndex(int startindex) {
 
 void Lockerroom::setUser(std::string newUser) {
     this->user = newUser;
+}
+
+void Lockerroom::setHash(std::string hash) {
+    this->hash = hash;
 }
 
 void Lockerroom::setLockerroom(std::vector<Locker*> import) {
